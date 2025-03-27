@@ -1,5 +1,4 @@
-﻿using BepInEx;
-using UnityEngine;
+using BepInEx;
 
 namespace MyMod
 {
@@ -30,50 +29,13 @@ namespace MyMod
                 LoadAssetsInFolder(DirectoryPath); //we then recursively load this folder, repeating the process, basically the code repeats this function but
                 //on the subfolder, getting "Texture2" and then repeat on any subfolders (if there are any) in the subfolder!
             }
-            //once we finish loading all of the files, we need to take our files from our temporary database and put them in the games database
-            foreach (KeyValuePair<string, Sprite[]> keyValuePair in cached_assets_list)
-            {
-                //SpriteTextureLoader.cached_sprite_list is the secoundary database which stores textures
-                if (SpriteTextureLoader.cached_sprite_list.ContainsKey(keyValuePair.Key))//check if the secoundary data base already stores this texture, and if so, override it
-                {
-                    SpriteTextureLoader.cached_sprite_list[keyValuePair.Key] = keyValuePair.Value;
-                }
-                else//if it doesnt, simply add it
-                {
-                    SpriteTextureLoader.cached_sprite_list.Add(keyValuePair.Key, keyValuePair.Value);
-                }
-            }
         }
         private static void loadTexture(string pPath)
         {
-            string FileName = System.IO.Path.GetFileNameWithoutExtension(pPath); //gets the name of the texture without the extention,
-            //for example if it was "Texture1.png" we would get Texture1
             byte[] Bytes = File.ReadAllBytes(pPath); //all of the bytes stored in the file, which represent a bitmap image
             string Path = pPath.Remove(0, pPath.IndexOf("/"+AssetFolder) + AssetFolder.Length+2).Replace('\\', '/'); //we cut the path to the path that is only necessary, for example
             //if the mod was contained in steamapps/common/worldbox/Bepinex/plugins/YourMod/AssetFolder/SubFolder/Texture2, we cut this to SubFolder/Texture2
-            addSpriteList(Path, FileName, Bytes); //load the sprite and add it to our temporary data base
+            SpriteTextureLoader.addSprite(Path, Bytes); //load the sprite and add it to the game's secoundary data base
         }
-        public static void addSpriteList(string pPathID, string pSpriteName, byte[] pBytes)
-        {
-            Texture2D texture2D = new Texture2D(1, 1); //create a texture
-            texture2D.filterMode = FilterMode.Point; //it should be set to Point mode to not be blurry
-            if (texture2D.LoadImage(pBytes)) //load all of the bytes, and convert them into an image, this function is a extention from "UnityEngine.imageconversionmodel.dll" stored in the managed folder
-            {
-                Rect rect = new Rect(0f, 0f, texture2D.width, texture2D.height); //create a rectangle which is the size of the image
-                Vector2 vector = new Vector2(0.5f, 0.5f); //get the center of the image
-                Sprite sprite = Sprite.Create(texture2D, rect, vector, 1f); //create a sprite by using the texture and the rectangle
-                sprite.name = pSpriteName; //set its name
-                if (!cached_assets_list.ContainsKey(pPathID)) //check if our database already has this file, if it does override, if not add
-                {
-                    cached_assets_list.Add(pPathID, new Sprite[] { sprite });
-                }
-                else
-                {
-                    cached_assets_list[pPathID] = cached_assets_list[pPathID].Concat(new Sprite[] { sprite }).ToArray<Sprite>();
-                }
-            }
-        }
-        public static Dictionary<string, Sprite[]> cached_assets_list = new Dictionary<string, Sprite[]>();
-
     }
 }
