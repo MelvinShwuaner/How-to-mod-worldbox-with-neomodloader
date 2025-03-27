@@ -18,7 +18,7 @@ namespace MyMod
             
             foreach (string FilePath in files) //go through the list of files
             {
-                if (!FilePath.Contains(".json")) //if the file is not a JSON FILE, json files are explained in chapter 5
+                if (!FilePath.Contains(".json")) //if the file is not a JSON FILE, json files are explained in chapter 6
                 {
                     loadTexture(FilePath); //load the texture, adding it to our temporary database which we will use later
                 }
